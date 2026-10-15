@@ -6,3 +6,4 @@
 ### Inchara K Kuppal (PES1UG25CS818)
 ### Pranavi Sistla (PES1UG24CS338)
 ### Pavan Kumar H K (PES1UG24CS319) 
+"* Inchara K Kuppal - Output and Decompression modules" 
