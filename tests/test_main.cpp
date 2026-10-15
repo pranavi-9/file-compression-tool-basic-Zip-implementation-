@@ -1,13 +1,17 @@
-// test_main.cpp - unit tests (no external libraries needed)
-// Build and run with:  make test
-// PROJECT SETUP VERSION: a single placeholder test so the pipeline runs.
-// Real tests are added in Sprint 1, named after the test-plan IDs (TC-...).
+
 #include "huffzip.h"
+#include "huffman.hpp"
 
 #include <iostream>
 
+// Implemented in tests/test_huffman.cpp
+void run_huffman_tests();
+
 int main() {
-    std::cout << "[PASS] project setup: test runner works\n"
-                 "All tests passed\n";
+    std::cout << "Running project tests...\n";
+
+    run_huffman_tests();
+
+    std::cout << "All tests passed\n";
     return 0;
 }

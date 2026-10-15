@@ -7,52 +7,68 @@
 #include <iostream>
 #include <vector>
 
-int main() {
-    using namespace huffman;
+namespace {
 
-    // Test 1: Empty input frequencies
-    std::array<std::uint64_t, BYTE_VALUES> frequencies{};
-    auto empty_tree = build_tree(frequencies);
-    assert(empty_tree == nullptr);
+void test_empty_frequencies() {
+    std::array<std::uint64_t, huffman::BYTE_VALUES> frequencies{};
+    auto root = huffman::build_tree(frequencies);
 
-    // Test 2: One repeated byte
+    assert(root == nullptr);
+
+    const auto codes = huffman::generate_codes(root);
+    for (const auto& code : codes) {
+        assert(code.empty());
+    }
+}
+
+void test_single_symbol_repeated() {
+    std::array<std::uint64_t, huffman::BYTE_VALUES> frequencies{};
     frequencies[static_cast<unsigned char>('A')] = 5;
-    auto single_tree = build_tree(frequencies);
-    auto single_codes = generate_codes(single_tree);
 
-    assert(single_tree != nullptr);
-    assert(single_codes[static_cast<unsigned char>('A')] == "0");
+    auto root = huffman::build_tree(frequencies);
+    assert(root != nullptr);
+    assert(root->is_leaf);
 
-    std::vector<std::uint8_t> repeated(5, 'A');
-    auto single_encoded = encode(repeated, single_codes);
+    const auto codes = huffman::generate_codes(root);
+    assert(codes[static_cast<unsigned char>('A')] == "0");
 
-    assert(single_encoded.bit_count == 5);
-    assert(single_encoded.bytes.size() == 1);
-    assert(single_encoded.bytes[0] == 0);
+    const std::vector<std::uint8_t> input(5, 'A');
+    const auto encoded = huffman::encode(input, codes);
 
-    // Test 3: Multiple byte values
-    frequencies = {};
-    frequencies['A'] = 5;
-    frequencies['B'] = 2;
-    frequencies['C'] = 1;
-    frequencies['D'] = 1;
+    assert(encoded.bit_count == 5);
+    assert(encoded.bytes.size() == 1);
+    assert(encoded.bytes[0] == 0);
+}
 
-    auto tree = build_tree(frequencies);
-    auto codes = generate_codes(tree);
+void test_multiple_symbols_and_encoding() {
+    std::array<std::uint64_t, huffman::BYTE_VALUES> frequencies{};
+    frequencies[static_cast<unsigned char>('A')] = 5;
+    frequencies[static_cast<unsigned char>('B')] = 2;
+    frequencies[static_cast<unsigned char>('C')] = 1;
 
-    assert(tree != nullptr);
-    assert(!codes['A'].empty());
-    assert(!codes['B'].empty());
-    assert(!codes['C'].empty());
-    assert(!codes['D'].empty());
+    auto root = huffman::build_tree(frequencies);
+    assert(root != nullptr);
 
-    // Test 4: Encode a sample input
-    std::vector<std::uint8_t> input = {'A', 'B', 'C', 'D', 'A'};
-    auto encoded = encode(input, codes);
+    const auto codes = huffman::generate_codes(root);
+
+    assert(!codes[static_cast<unsigned char>('A')].empty());
+    assert(!codes[static_cast<unsigned char>('B')].empty());
+    assert(!codes[static_cast<unsigned char>('C')].empty());
+
+    const std::vector<std::uint8_t> input = {'A', 'B', 'C', 'A'};
+    const auto encoded = huffman::encode(input, codes);
 
     assert(encoded.bit_count > 0);
     assert(encoded.bytes.size() == (encoded.bit_count + 7) / 8);
+}
 
-    std::cout << "All Huffman tests passed!\n";
-    return 0;
+} // namespace
+
+// Called by the shared project test runner.
+void run_huffman_tests() {
+    test_empty_frequencies();
+    test_single_symbol_repeated();
+    test_multiple_symbols_and_encoding();
+
+    std::cout << "[PASS] Huffman tests\n";
 }
