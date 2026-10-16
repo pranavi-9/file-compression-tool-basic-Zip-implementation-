@@ -1,9 +1,11 @@
+
 # build output
 huffzip
 huffzip.exe
 run_tests
 run_tests.exe
 *.o
+*.exe
 
 # generated test data and outputs
 *.huff
